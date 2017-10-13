@@ -148,6 +148,9 @@ def admin_team(teamid):
             if not valid_email:
                 errors.append("That email address is invalid")
 
+        if website and not (website.startswith('http://') or website.startswith('https://')):
+            errors.append('Websites must start with http:// or https://')
+
         name_used = Teams.query.filter(Teams.name == name).first()
         if name_used and int(name_used.id) != int(teamid):
             errors.append('That name is taken')

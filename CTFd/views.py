@@ -235,6 +235,8 @@ def profile():
                 errors.append('Pick a longer team name')
             if website.strip() and not utils.validate_url(website):
                 errors.append("That doesn't look like a valid URL")
+            if website.strip() and not (website.startswith('http://') or website.startswith('https://')):
+                errors.append("The URL must start with http:// or https://")
 
             if len(errors) > 0:
                 return render_template('profile.html', name=name, email=email, website=website,
