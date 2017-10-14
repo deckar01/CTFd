@@ -92,6 +92,22 @@ def admin_export_ctf():
     return send_file(backup, as_attachment=True, attachment_filename=full_name)
 
 
+@admin.route('/admin/pause')
+@admins_only
+def admin_pause():
+    utils.set_config('paused', True)
+    db.session.close()
+    return redirect(url_for('admin.admin_config'))
+
+
+@admin.route('/admin/resume')
+@admins_only
+def admin_resume():
+    utils.set_config('paused', False)
+    db.session.close()
+    return redirect(url_for('admin.admin_config'))
+
+
 @admin.route('/admin/config', methods=['GET', 'POST'])
 @admins_only
 def admin_config():
@@ -193,6 +209,7 @@ def admin_config():
     mg_base_url = utils.get_config('mg_base_url')
 
     view_after_ctf = utils.get_config('view_after_ctf')
+    paused = utils.get_config('paused')
     start = utils.get_config('start')
     end = utils.get_config('end')
     freeze = utils.get_config('freeze')
@@ -216,6 +233,7 @@ def admin_config():
     return render_template('admin/config.html',
                            ctf_name=ctf_name,
                            ctf_theme_config=ctf_theme,
+                           paused=paused,
                            start=start,
                            end=end,
                            freeze=freeze,

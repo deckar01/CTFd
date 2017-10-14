@@ -3,7 +3,7 @@ import logging
 import re
 import time
 
-from flask import render_template, request, redirect, jsonify, url_for, session, Blueprint, abort
+from flask import render_template, request, redirect, jsonify, url_for, session, Blueprint, abort, make_response
 from sqlalchemy.sql import or_
 
 from CTFd.models import db, Challenges, Files, Solves, WrongKeys, Keys, Tags, Teams, Awards, Hints, Unlocks
@@ -77,6 +77,8 @@ def challenges_view():
             if utils.view_after_ctf():  # But we are allowed to view after the CTF ends
                 pass
             else:  # We are NOT allowed to view after the CTF ends
+                if utils.ctf_paused():
+                    errors.append('{} is paused'.format(utils.ctf_name()))
                 if utils.get_config('start') and not utils.ctf_started():
                     errors.append('{} has not started yet'.format(utils.ctf_name()))
                 if (utils.get_config('end') and utils.ctf_ended()) and not utils.view_after_ctf():
@@ -89,6 +91,8 @@ def challenges_view():
                 return redirect(url_for('auth.confirm_user'))
 
     if utils.user_can_view_challenges():  # Do we allow unauthenticated users?
+        if utils.ctf_paused():
+            errors.append('{} is paused'.format(utils.ctf_name()))
         if utils.get_config('start') and not utils.ctf_started():
             errors.append('{} has not started yet'.format(utils.ctf_name()))
         if (utils.get_config('end') and utils.ctf_ended()) and not utils.view_after_ctf():
@@ -104,8 +108,10 @@ def chals():
         if not utils.ctftime():
             if utils.view_after_ctf():
                 pass
+            elif utils.ctf_paused():
+                abort(make_response('{} paused'.format(utils.ctf_name()), 503))
             else:
-                abort(403)
+                abort(make_response('These are not the challenges you are looking for'), 403))
 
     if utils.get_config('verify_emails'):
         if utils.authed():

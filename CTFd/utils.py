@@ -308,6 +308,11 @@ def is_scoreboard_frozen():
 def ctftime():
     """ Checks whether it's CTF time or not. """
 
+    paused = get_config("paused") or False
+
+    if paused:
+        return False
+
     start = get_config("start")
     end = get_config("end")
 
@@ -338,6 +343,10 @@ def ctftime():
         return True
 
     return False
+
+
+def ctf_paused():
+    return get_config("paused") or False
 
 
 def ctf_started():

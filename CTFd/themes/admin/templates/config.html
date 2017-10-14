@@ -193,6 +193,9 @@
 							<a href="#start-date" aria-controls="start-date" role="tab" data-toggle="tab">Start Time</a>
 						</li>
 						<li role="presentation">
+							<a href="#pause" aria-controls="pause" role="tab" data-toggle="tab">Pause</a>
+						</li>
+						<li role="presentation">
 							<a href="#end-date" aria-controls="end-date" role="tab" data-toggle="tab">End Time</a>
 						</li>
 						<li role="presentation">
@@ -259,6 +262,19 @@
 									<input class="form-control" id='start' name='start' type='text'
 										placeholder="Start Date (UTC timestamp)"
 										{% if start is defined and start != None %}value="{{ start }}"{% endif %} readonly>
+								</div>
+							</div>
+						</div>
+						<div role="tabpanel" class="tab-pane" id="pause">
+							<div class="row">
+								<div class="col-xs-12">
+									<br>
+									The CTF is {% if not paused %}not{% endif %} paused.
+									{% if not paused %}
+									<a href="/admin/pause" class="btn btn-lg btn-primary btn-theme btn-outlined pull-right">Pause</a>
+									{% else %}
+									<a href="/admin/resume" class="btn btn-lg btn-primary btn-theme btn-outlined pull-right">Resume</a>
+									{% endif %}
 								</div>
 							</div>
 						</div>

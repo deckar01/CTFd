@@ -259,6 +259,9 @@ function loadchals(cb) {
         if (cb){
             cb();
         }
+    })
+    .fail(function(err) {
+      $('#challenges-board').text(err.responseText);
     });
 }
 

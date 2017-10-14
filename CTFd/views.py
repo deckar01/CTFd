@@ -56,6 +56,7 @@ def setup():
             max_tries = utils.set_config('max_tries', 0)
 
             # Start time
+            paused = utils.set_config('paused', False)
             start = utils.set_config('start', None)
             end = utils.set_config('end', None)
             freeze = utils.set_config('freeze', None)
