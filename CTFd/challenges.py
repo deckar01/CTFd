@@ -111,7 +111,7 @@ def chals():
             elif utils.ctf_paused():
                 abort(make_response('{} paused'.format(utils.ctf_name()), 503))
             else:
-                abort(make_response('These are not the challenges you are looking for'), 403))
+                abort(make_response('These are not the challenges you are looking for', 403))
 
     if utils.get_config('verify_emails'):
         if utils.authed():
