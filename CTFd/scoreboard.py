@@ -1,3 +1,4 @@
+from datetime import datetime
 from flask import render_template, jsonify, Blueprint, redirect, url_for, request
 from sqlalchemy.sql.expression import union_all
 
@@ -8,7 +9,7 @@ from CTFd import utils
 scoreboard = Blueprint('scoreboard', __name__)
 
 
-def get_standings(admin=False, count=None):
+def get_standings(admin=False, count=None, allteams=False):
     scores = db.session.query(
         Solves.teamid.label('teamid'),
         db.func.sum(Challenges.value).label('score'),
@@ -23,6 +24,7 @@ def get_standings(admin=False, count=None):
         db.func.max(Awards.date).label('date')
     ).group_by(Awards.teamid)
 
+
     """
     Filter out solves and awards that are before a specific time point.
     """
@@ -34,7 +36,17 @@ def get_standings(admin=False, count=None):
     """
     Combine awards and solves with a union. They should have the same amount of columns
     """
-    results = union_all(scores, awards).alias('results')
+
+    if allteams:
+        teams = db.session.query(
+            Teams.id.label('teamid'),
+            db.literal('0',db.Integer).label('score'),
+            db.literal('0',db.Integer).label('id'),
+            db.literal(datetime(2000,1,1),db.DateTime).label('date')
+        )
+        results = union_all(scores, awards, teams).alias('results')
+    else:
+        results = union_all(scores, awards).alias('results')
 
     """
     Sum each of the results by the team id to get their score.
@@ -95,14 +107,18 @@ def scoreboard_view():
 
 
 @scoreboard.route('/scores')
-def scores():
+@scoreboard.route('/scores/<allteams>')
+def scores(allteams=None):
     json = {'standings': []}
     if utils.get_config('view_scoreboard_if_authed') and not utils.authed():
         return redirect(url_for('auth.login', next=request.path))
     if utils.hide_scores():
         return jsonify(json)
 
-    standings = get_standings()
+    if allteams == 'all':
+        standings = get_standings(allteams=True)
+    else:
+        standings = get_standings()
 
     for i, x in enumerate(standings):
         json['standings'].append({'pos': i + 1, 'id': x.teamid, 'team': x.name, 'score': int(x.score)})
