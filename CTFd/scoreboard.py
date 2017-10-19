@@ -24,7 +24,6 @@ def get_standings(admin=False, count=None, allteams=False):
         db.func.max(Awards.date).label('date')
     ).group_by(Awards.teamid)
 
-
     """
     Filter out solves and awards that are before a specific time point.
     """
@@ -40,9 +39,9 @@ def get_standings(admin=False, count=None, allteams=False):
     if allteams:
         teams = db.session.query(
             Teams.id.label('teamid'),
-            db.literal('0',db.Integer).label('score'),
-            db.literal('0',db.Integer).label('id'),
-            db.literal(datetime(2000,1,1),db.DateTime).label('date')
+            db.literal('0', db.Integer).label('score'),
+            db.literal('0', db.Integer).label('id'),
+            db.literal(datetime(2000, 1, 1), db.DateTime).label('date'),
         )
         results = union_all(scores, awards, teams).alias('results')
     else:
