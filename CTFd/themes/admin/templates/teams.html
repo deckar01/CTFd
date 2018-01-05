@@ -188,7 +188,7 @@ input[type="checkbox"] { margin: 0px !important; position: relative; top: 5px; }
 			{% endfor %}
 		</tbody>
 	</table>
-	{% if pages > 1 %}
+	{% if pages and pages > 1 %}
 	<div class="text-center">Page
 		<br>
 		{% if curr_page != 1 %}<a href="{{ request.script_root }}/admin/teams/{{ curr_page-1 }}">&lt;&lt;&lt;</a>{% endif %}
