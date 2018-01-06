@@ -327,8 +327,8 @@ def chal(chalid=None):
             if possible_challenge:
                 chalid = possible_challenge.chal
             else:
-                chalid = Challenges.query.filter(Challenges.type == 'bonus').first().id
-                phantom=True
+                chalid =git a Challenges.query.filter(Challenges.type == 'bonus').first().id
+                phantom = True
 
         team = Teams.query.filter_by(id=session['id']).first()
         fails = WrongKeys.query.filter_by(teamid=session['id'], chalid=chalid).count()
