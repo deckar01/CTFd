@@ -304,13 +304,32 @@ def who_solved(chalid):
     return jsonify(json)
 
 
+@challenges.route('/bonus', methods=['POST'])
+def bonus():
+    result = json.loads(chal().data)
+    bonuses = Solves.query.join(Challenges).filter(Solves.teamid == session['id'], Challenges.type == 'bonus').all()
+    return render_template('bonus.html', bonuses=bonuses, message=result['message'])
+
+
+@challenges.route('/chal', methods=['POST'])
 @challenges.route('/chal/<int:chalid>', methods=['POST'])
-def chal(chalid):
+def chal(chalid=None):
     if utils.ctf_ended() and not utils.view_after_ctf():
         abort(403)
     if not utils.user_can_view_challenges():
         return redirect(url_for('auth.login', next=request.path))
     if (utils.authed() and utils.is_verified() and (utils.ctf_started() or utils.view_after_ctf())) or utils.is_admin():
+
+        # No Challenge Id Supplied
+        phantom = False
+        if not chalid:
+            possible_challenge = Keys.query.filter(Keys.flag == request.form['key'].strip()).first()
+            if possible_challenge:
+                chalid = possible_challenge.chal
+            else:
+                chalid = Challenges.query.filter(Challenges.type == 'bonus').first().id
+                phantom = True
+
         team = Teams.query.filter_by(id=session['id']).first()
         fails = WrongKeys.query.filter_by(teamid=session['id'], chalid=chalid).count()
         logger = logging.getLogger('keys')
@@ -318,7 +337,7 @@ def chal(chalid):
         print("[{0}] {1} submitted {2} with kpm {3}".format(*data))
 
         chal = Challenges.query.filter_by(id=chalid).first_or_404()
-        if chal.hidden:
+        if chal.hidden and chal.type != 'bonus':
             abort(404)
         chal_class = get_chal_class(chal.type)
 
@@ -333,7 +352,7 @@ def chal(chalid):
         solves = Solves.query.filter_by(teamid=session['id'], chalid=chalid).first()
 
         # Challange not solved yet
-        if not solves:
+        if not solves or phantom:
             provided_key = request.form['key'].strip()
             saved_keys = Keys.query.filter_by(chal=chal.id).all()
 
