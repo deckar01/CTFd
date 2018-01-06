@@ -327,7 +327,7 @@ def chal(chalid=None):
             if possible_challenge:
                 chalid = possible_challenge.chal
             else:
-                chalid =git a Challenges.query.filter(Challenges.type == 'bonus').first().id
+                chalid = Challenges.query.filter(Challenges.type == 'bonus').first().id
                 phantom = True
 
         team = Teams.query.filter_by(id=session['id']).first()
