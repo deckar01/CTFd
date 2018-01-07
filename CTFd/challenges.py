@@ -304,10 +304,12 @@ def who_solved(chalid):
     return jsonify(json)
 
 
-@challenges.route('/bonus', methods=['POST'])
+@challenges.route('/bonus', methods=['POST', 'GET'])
 def bonus():
-    result = json.loads(chal().data)
     bonuses = Solves.query.join(Challenges).filter(Solves.teamid == session['id'], Challenges.type == 'bonus').all()
+    if request.method == 'GET' or not bonuses:
+        return render_template('bonus.html', bonuses=bonuses, message='')
+    result = json.loads(chal().data)
     return render_template('bonus.html', bonuses=bonuses, message=result['message'])
 
 
